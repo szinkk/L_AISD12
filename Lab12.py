@@ -9,17 +9,18 @@ import numpy as np
 from decimal import Decimal, getcontext
 
 
-# Функция вычисляющая значение ряда
-def calculations(accuracy, matrix):
+# Функция вычисляющая сумму знакопеременного ряда
+def calculations(matrix, accuracy):
     # Задаем переменные для вычислений
-    n = 1  # номер слагаемого
-    sum_series = 0  # сумма ряда
-    fact = 1  # факториал
-    sign = random.choice([-1, 1])  # выбор случайного знака
+    n = 1
+    sum_series = 0
+    fact = 1
+    sign = random.choice([1, -1])
+    curr_matrix = matrix
 
     while True:
         # Вычисление текущего члена ряда и сложение с предыдущими членами
-        curr_term = Decimal(np.linalg.det(matrix) / fact)
+        curr_term = Decimal(np.linalg.det(curr_matrix) / fact)
         sum_series += sign * curr_term
 
         # Проверка точности вычислений
@@ -27,10 +28,10 @@ def calculations(accuracy, matrix):
             break
 
         # Считаем переменные для следующей итерации цикла
-        n += 1  # прибавляем к номеру слагаемого единицу
-        sign = -sign  # меняем знак
-        fact *= n  # считаем факториал
-        matrix = np.linalg.matrix_power(matrix, 2)  # возводим матрицу в степень
+        n += 1
+        sign = -sign
+        fact *= n
+        curr_matrix *= curr_matrix
 
     return sum_series  # возвращаем сумму ряда
 
@@ -38,21 +39,21 @@ def calculations(accuracy, matrix):
 try:
     # Считываем значение точности вычислений
     t = int(input("Введите число t > 0\nt - количество знаков после запятой\n"))
-    while t < 1:
-        t = int(input("Вы ввели некорректное значение t\nt должно быть больше 1\nВведите корректное значение t\n"))
+    while t > 323 and t < 1:
+        t = int(input("Вы ввели некорректное значение t\n"))
 
     # Создаем матрицу со значениями от -1 до 1 и случайно созданным рангом k
     k = random.randint(2, 10)
-    x = np.round(np.random.uniform(-1, 1, (k, k)), 5)
+    x = np.round(np.random.uniform(-1, 1, (k, k)), 3)
 
     # Выводим матрицу
     print(f"\nМатрица:\n{x}")
 
     # Считываем значение точности t для Decimal
-    getcontext().prec = t
+    getcontext().prec = t + 100
 
     # Вызываем функцию вычисления ряда
-    output = calculations(t, x)
+    output = calculations(x, t)
 
     # Выводим сумму ряда с заданной точностью
     print(f"Сумма ряда с точностью до {t} знаков после запятой: {output:.{t}f}")
